@@ -33,7 +33,7 @@ class TGN(torch.nn.Module):
         self.logger = logging.getLogger(__name__)
 
         self.node_raw_features = torch.from_numpy(
-            node_features.astype(np.float32)).to(device)
+                node_features.astype(np.float32)).to(device)[:, :100]
         self.edge_raw_features = torch.from_numpy(
             edge_features.astype(np.float32)).to(device)
 

@@ -149,17 +149,15 @@ full_ngh_finder = get_neighbor_finder(full_data, args.uniform)
 # Initialize negative samplers. Set seeds for validation and testing so negatives are the same
 # across different runs
 # NB: in the inductive setting, negatives are sampled only amongst other new nodes
-train_rand_sampler = RandEdgeSampler(
-    train_data.sources, train_data.destinations)
-val_rand_sampler = RandEdgeSampler(
-    full_data.sources, full_data.destinations, seed=0)
-nn_val_rand_sampler = RandEdgeSampler(
-    new_node_val_data.sources, new_node_val_data.destinations, seed=1)
-test_rand_sampler = RandEdgeSampler(
-    full_data.sources, full_data.destinations, seed=2)
-nn_test_rand_sampler = RandEdgeSampler(new_node_test_data.sources,
-                                       new_node_test_data.destinations,
-                                       seed=3)
+
+num_nodes = max(full_data.sources.max(), full_data.destinations.max()) + 1
+train_rand_sampler = RandEdgeSampler(num_nodes)
+val_rand_sampler = RandEdgeSampler(num_nodes)
+nn_val_rand_sampler = RandEdgeSampler(num_nodes)
+test_rand_sampler = RandEdgeSampler(num_nodes)
+nn_test_rand_sampler = RandEdgeSampler(num_nodes)
+                                      
+                                     
 
 # Set device
 device_string = 'cuda:{}'.format(GPU) if torch.cuda.is_available() else 'cpu'
@@ -244,7 +242,7 @@ for i in range(args.n_runs):
                 timestamps_batch = train_data.timestamps[start_idx:end_idx]
 
                 size = len(sources_batch)
-                _, negatives_batch = train_rand_sampler.sample(size)
+                negatives_batch = train_rand_sampler.sample(size)
 
                 with torch.no_grad():
                     pos_label = torch.ones(
