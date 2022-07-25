@@ -1,5 +1,7 @@
-import numpy as np
+import os
 import random
+
+import numpy as np
 import pandas as pd
 
 
@@ -14,12 +16,16 @@ class Data:
     self.unique_nodes = set(sources) | set(destinations)
     self.n_unique_nodes = len(self.unique_nodes)
 
+def get_project_root_dir() -> str:
+    return os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 def get_data_node_classification(dataset_name, use_validation=False):
   ### Load data and train val test split
-  graph_df = pd.read_csv('./data/ml_{}.csv'.format(dataset_name))
-  edge_features = np.load('./data/ml_{}.npy'.format(dataset_name))
-  node_features = np.load('./data/ml_{}_node.npy'.format(dataset_name))
+  data_dir = os.path.join(get_project_root_dir(), "data")
+
+  graph_df = pd.read_csv(os.path.join(data_dir, 'ml_{}.csv'.format(dataset_name)))
+  edge_features = np.load(os.path.join(data_dir, 'ml_{}.npy'.format(dataset_name)))
+  node_features = np.load(os.path.join(data_dir, 'ml_{}_node.npy'.format(dataset_name)))
 
   val_time, test_time = list(np.quantile(graph_df.ts, [0.70, 0.85]))
 
@@ -51,10 +57,13 @@ def get_data_node_classification(dataset_name, use_validation=False):
 
 def get_data(dataset_name, different_new_nodes_between_val_and_test=False, randomize_features=False):
   ### Load data and train val test split
-  graph_df = pd.read_csv('./data/ml_{}.csv'.format(dataset_name))
-  edge_features = np.load('./data/ml_{}.npy'.format(dataset_name))
-  node_features = np.load('./data/ml_{}_node.npy'.format(dataset_name)) 
-    
+  data_dir = os.path.join(get_project_root_dir(), "data")
+
+  graph_df = pd.read_csv(os.path.join(data_dir, 'ml_{}.csv'.format(dataset_name)))
+  edge_features = np.load(os.path.join(data_dir, 'ml_{}.npy'.format(dataset_name)))
+  node_features = np.load(os.path.join(data_dir, 'ml_{}_node.npy'.format(dataset_name)))
+
+   
   if randomize_features:
     node_features = np.random.rand(node_features.shape[0], node_features.shape[1])
 
